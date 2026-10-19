@@ -1,9 +1,4 @@
-/**
- * Pruebas de ConversorTiempo (T-04 / Issue #4), sin librerias externas.
- *
- * Compilar: javac -d out src/*.java tests/PruebasConversorTiempo.java
- * Ejecutar: java -cp out PruebasConversorTiempo
- */
+
 public class PruebasConversorTiempo {
 
     private static int total = 0;
