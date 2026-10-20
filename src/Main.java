@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -115,11 +116,30 @@ public class Main {
             System.out.println("\nPrimero registre un menu con al menos " + MINIMO_PLATOS + " platos (opcion 1).");
             return;
         }
-        System.out.println("\nEl calculo del cronograma se implementa en los Sprints 2 y 3.");
+
+        List<PasoCronograma> pasos = Planificador.calcularInverso(platos, horaServicioMin);
+        pasos.sort(Comparator.comparingInt(PasoCronograma::getInicioMin));
+        mostrarCronograma(pasos);
+    }
+
+    private static void mostrarCronograma(List<PasoCronograma> pasos) {
+        System.out.println("\n--- CRONOGRAMA (servicio a las " + formatearHora(horaServicioMin) + ") ---");
+        System.out.printf("%-12s%-12s%-20s%-25s%-8s%n", "Hora inicio", "Hora fin", "Plato", "Tarea", "Tipo");
+        for (PasoCronograma paso : pasos) {
+            System.out.printf("%-12s%-12s%-20s%-25s%-8s%n",
+                    formatearHora(paso.getInicioMin()),
+                    formatearHora(paso.getFinMin()),
+                    paso.getNombrePlato(),
+                    paso.getTarea().getNombre(),
+                    paso.getTarea().getTipo().getEtiqueta());
+        }
     }
 
     private static String formatearHora(int minutosDesdeMedianoche) {
-        return String.format("%02d:%02d", minutosDesdeMedianoche / 60, minutosDesdeMedianoche % 60);
+        if (minutosDesdeMedianoche < 0) {
+            return "<00:00";
+        }
+        return ConversorTiempo.minutosAHora(minutosDesdeMedianoche);
     }
 
     
@@ -174,13 +194,8 @@ public class Main {
     private static int leerHora(String mensaje) {
         while (true) {
             String texto = leerLinea(mensaje);
-            if (texto.matches("\\d{1,2}:\\d{2}")) {
-                String[] partes = texto.split(":");
-                int horas = Integer.parseInt(partes[0]);
-                int minutos = Integer.parseInt(partes[1]);
-                if (horas <= 23 && minutos <= 59) {
-                    return horas * 60 + minutos;
-                }
+            if (ConversorTiempo.esHoraValida(texto)) {
+                return ConversorTiempo.horaAMinutos(texto);
             }
             System.out.println("  Error: formato de hora invalido. Use HH:mm de 24 horas (ej. 13:30).");
         }
