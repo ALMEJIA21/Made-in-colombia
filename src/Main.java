@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -117,9 +116,9 @@ public class Main {
             return;
         }
 
-        List<PasoCronograma> pasos = Planificador.calcularInverso(platos, horaServicioMin);
-        pasos.sort(Comparator.comparingInt(PasoCronograma::getInicioMin));
-        mostrarCronograma(pasos);
+        Cronograma cronograma = new Cronograma(Planificador.calcularInverso(platos, horaServicioMin));
+            mostrarCronograma(cronograma.getPasos());   
+    
     }
 
     private static void mostrarCronograma(List<PasoCronograma> pasos) {
