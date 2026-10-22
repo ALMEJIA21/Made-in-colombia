@@ -1,6 +1,5 @@
 # Casos de prueba - T-04 Conversion Min/Hora (Issue #4, HU-04)
 
-Compilar: `javac -d out src/*.java tests/PruebasConversorTiempo.java`  |  Ejecutar: `java -cp out PruebasConversorTiempo`
 
 | ID | Funcionalidad | Datos de entrada | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|---|
