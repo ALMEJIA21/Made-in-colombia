@@ -13,3 +13,7 @@ Servicio a las 13:00 en todos los casos. (A) = activa, (P) = pasiva.
 | CT-A05 | Tres platos con muchas activas | P1, P2 y P3 con 9 tareas | Ningun par de activas se solapa; 9 pasos; orden de cada plato conservado | Coincide | Satisfactorio |
 | CT-A06 | Un solo plato | Solo Arroz con coco | Igual al calculo inverso del #5 | Igual | Satisfactorio |
 | CT-A07 | Entradas invalidas | Lista vacia, lista nula, hora 1440 | Lanza IllegalArgumentException | Lanza la excepcion | Satisfactorio |
+
+
+//tests
+
