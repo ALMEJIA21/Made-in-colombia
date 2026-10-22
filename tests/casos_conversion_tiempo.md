@@ -1,5 +1,6 @@
 # Casos de prueba - T-04 Conversion Min/Hora (Issue #4, HU-04)
 
+Compilar: `javac -d out src/*.java   Ejecutar: `java -cp out Main`
 
 | ID | Funcionalidad | Datos de entrada | Resultado esperado | Resultado obtenido | Estado |
 |---|---|---|---|---|---|

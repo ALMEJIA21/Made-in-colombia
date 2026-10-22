@@ -1,6 +1,6 @@
 # Casos de prueba - T-06 Aprovechamiento de tiempos pasivos (Issue #6, HU-06)
 
-Compilar: `javac -d out src/*.java tests/PruebasAprovechamiento.java`  |  Ejecutar: `java -cp out PruebasAprovechamiento`
+Compilar: `javac -d out src/*.java   Ejecutar: `java -cp out Main`
 
 Servicio a las 13:00 en todos los casos. (A) = activa, (P) = pasiva.
 

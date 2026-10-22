@@ -110,16 +110,18 @@ public class Main {
         }
     }
 
-    private static void calcularCronograma() {
+       private static void calcularCronograma() {
         if (platos.size() < MINIMO_PLATOS || horaServicioMin < 0) {
             System.out.println("\nPrimero registre un menu con al menos " + MINIMO_PLATOS + " platos (opcion 1).");
             return;
         }
 
-        Cronograma cronograma = new Cronograma(Planificador.calcularCronograma(platos, horaServicioMin));           
-        mostrarCronograma(cronograma.getPasos());   
-    
+        int horaActualMin = LecturaConsola.leerHora("Hora actual o de inicio disponible (HH:mm): ");
+        Cronograma cronograma = new Cronograma(Planificador.calcularCronograma(platos, horaServicioMin));
+        ValidadorHorario validador = new ValidadorHorario(cronograma, horaServicioMin, horaActualMin);
+        System.out.println("\n" + ReporteCronograma.formatear(cronograma, validador));
     }
+        
 
     private static void mostrarCronograma(List<PasoCronograma> pasos) {
         System.out.println("\n--- CRONOGRAMA (servicio a las " + formatearHora(horaServicioMin) + ") ---");
