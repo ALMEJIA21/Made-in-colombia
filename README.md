@@ -6,7 +6,7 @@ Proyecto del equipo de la ficha 3311658 ADSO, desarrollado con Scrum.
 
 ## Requisitos
 
-- JDK 14 o superior (probado con JDK 21).
+- JDK 21 o superior (probado con JDK 21).
 - Una terminal (o el terminal de un IDE como IntelliJ, Eclipse o VS Code).
 - No usa librerías externas.
 
