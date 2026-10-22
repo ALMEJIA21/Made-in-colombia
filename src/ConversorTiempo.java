@@ -1,15 +1,4 @@
-/**
- * Utilidades para convertir entre el formato de hora "HH:mm" (24 horas) y
- * los minutos transcurridos desde la medianoche (0 a 1439).
- *
- * Trabajar internamente en minutos enteros simplifica los calculos del
- * cronograma (restar duraciones, comparar horas) y evita errores de
- * aritmetica sexagesimal. Esta clase es la unica que traduce entre ambas
- * representaciones.
- *
- * Regla de negocio: no se contempla cruzar la medianoche, por eso los
- * minutos validos estan limitados al mismo dia.
- */
+
 public final class ConversorTiempo {
 
     public static final int MINUTOS_POR_HORA = 60;

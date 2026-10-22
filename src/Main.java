@@ -116,8 +116,8 @@ public class Main {
             return;
         }
 
-        Cronograma cronograma = new Cronograma(Planificador.calcularInverso(platos, horaServicioMin));
-            mostrarCronograma(cronograma.getPasos());   
+        Cronograma cronograma = new Cronograma(Planificador.calcularCronograma(platos, horaServicioMin));           
+        mostrarCronograma(cronograma.getPasos());   
     
     }
 
