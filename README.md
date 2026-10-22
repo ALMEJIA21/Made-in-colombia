@@ -105,8 +105,7 @@ También hay pruebas automáticas de dos clases:
 
 ```bash
 javac -d out src/*.java tests/*.java
-java -cp out PruebasConversorTiempo
-java -cp out PruebasPlanificador
+
 ```
 
 ## Equipo
