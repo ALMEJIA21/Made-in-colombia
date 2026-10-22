@@ -1,6 +1,6 @@
 # Casos de prueba - T-05 Calculo inverso (Issue #5, HU-05)
 
-Compilar: `javac -d out src/*.java tests/PruebasPlanificador.java`  |  Ejecutar: `java -cp out PruebasPlanificador`
+Compilar: `javac -d out src/*.java  Ejecutar: `java -cp out Main`
 
 Escenario de referencia: servicio 13:00. Arroz con coco (Lavar y sofreir 10 min Activa, Cocinar arroz 30 min Pasiva). Pollo sudado (Picar verduras 15 min Activa, Cocer pollo 40 min Pasiva).
 
