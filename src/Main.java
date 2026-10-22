@@ -1,20 +1,18 @@
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.Map;
 
 
 public class Main {
 
     private static final int MINIMO_PLATOS = 2;
 
-    private static int horaServicioMin = -1;  
-    private static final List<Plato> platos = new ArrayList<>();
+    private static int horaServicioMin = -1;
    
-    private static final Set<String> nombresPlatos = new HashSet<>();
-
-    private static final Scanner SCANNER = new Scanner(System.in);
+    private static final List<Plato> platos = new ArrayList<>();
+  
+    private static final Map<String, Plato> platosPorNombre = new HashMap<>();
 
     public static void main(String[] args) {
         System.out.println("=== MADE IN COLOMBIA ===");
@@ -25,13 +23,15 @@ public class Main {
             System.out.println("\n--- MENU PRINCIPAL ---");
             System.out.println("1) Registrar menu (hora de servicio, platos y tareas)");
             System.out.println("2) Calcular y mostrar cronograma");
-            System.out.println("3) Salir");
-            int opcion = leerOpcion("Elija una opcion: ", 1, 3);
+            System.out.println("3) Consultar cronograma (por plato, por tipo o resumen)");
+            System.out.println("4) Salir");
+            int opcion = LecturaConsola.leerOpcion("Elija una opcion: ", 1, 4);
 
             switch (opcion) {
                 case 1 -> registrarMenu();
                 case 2 -> calcularCronograma();
-                case 3 -> {
+                case 3 -> consultarCronograma();
+                case 4 -> {
                     System.out.println("Hasta pronto.");
                     salir = true;
                 }
@@ -42,25 +42,25 @@ public class Main {
 
     private static void registrarMenu() {
         platos.clear();
-        nombresPlatos.clear();
+        platosPorNombre.clear();
 
         System.out.println("\n--- REGISTRO DE MENU ---");
-        horaServicioMin = leerHora("Hora de servicio para todo el menu (HH:mm): ");
+        horaServicioMin = LecturaConsola.leerHora("Hora de servicio para todo el menu (HH:mm): ");
 
         boolean otroPlato = true;
         while (otroPlato) {
             String nombrePlato = leerNombrePlatoNuevo();
             Plato plato = new Plato(nombrePlato);
-            nombresPlatos.add(nombrePlato.toLowerCase());
 
             registrarTareas(plato);
             platos.add(plato);
+            platosPorNombre.put(plato.getNombre().toLowerCase(), plato);
             System.out.println("Plato registrado: " + plato);
 
             if (platos.size() < MINIMO_PLATOS) {
                 System.out.println("Faltan platos: el menu necesita al menos " + MINIMO_PLATOS + ".");
             } else {
-                otroPlato = leerOpcion("Agregar otro plato? (1 = Si, 2 = No): ", 1, 2) == 1;
+                otroPlato = LecturaConsola.leerOpcion("Agregar otro plato? (1 = Si, 2 = No): ", 1, 2) == 1;
             }
         }
 
@@ -73,24 +73,23 @@ public class Main {
 
         int opcionContinuar;
         do {
-            String nombreTarea = leerTexto("  Tarea #" + (plato.getTareas().size() + 1) + " - nombre: ");
-            int duracion = leerEnteroPositivo("  Duracion en minutos: ");
-            int tipoOpcion = leerOpcion("  Tipo (1 = Activa, 2 = Pasiva): ", 1, 2);
+            String nombreTarea = LecturaConsola.leerTexto("  Tarea #" + (plato.getTareas().size() + 1) + " - nombre: ");
+            int duracion = LecturaConsola.leerEnteroPositivo("  Duracion en minutos: ");
+            int tipoOpcion = LecturaConsola.leerOpcion("  Tipo (1 = Activa, 2 = Pasiva): ", 1, 2);
             Tarea.Tipo tipo = (tipoOpcion == 1) ? Tarea.Tipo.ACTIVA : Tarea.Tipo.PASIVA;
 
             plato.agregarTarea(new Tarea(nombreTarea, duracion, tipo));
             System.out.println("  Tarea agregada. Total del plato: " + plato.getDuracionTotal() + " min.");
 
-          
-            opcionContinuar = leerOpcion("  Agregar otra tarea? (1 = Si, 2 = Terminar plato): ", 1, 2);
+            opcionContinuar = LecturaConsola.leerOpcion("  Agregar otra tarea? (1 = Si, 2 = Terminar plato): ", 1, 2);
         } while (opcionContinuar == 1);
     }
 
 
     private static String leerNombrePlatoNuevo() {
         while (true) {
-            String nombre = leerTexto("\nNombre del plato #" + (platos.size() + 1) + ": ");
-            if (nombresPlatos.contains(nombre.toLowerCase())) {
+            String nombre = LecturaConsola.leerTexto("\nNombre del plato #" + (platos.size() + 1) + ": ");
+            if (platosPorNombre.containsKey(nombre.toLowerCase())) {
                 System.out.println("  Error: ya registro un plato llamado \"" + nombre + "\". Use otro nombre.");
             } else {
                 return nombre;
@@ -100,7 +99,7 @@ public class Main {
 
     private static void mostrarResumen() {
         System.out.println("\n--- RESUMEN DEL MENU ---");
-        System.out.println("Hora de servicio: " + formatearHora(horaServicioMin));
+        System.out.println("Hora de servicio: " + ReporteCronograma.formatearHora(horaServicioMin));
         for (Plato plato : platos) {
             System.out.println("* " + plato);
             List<Tarea> tareas = plato.getTareas();
@@ -110,95 +109,71 @@ public class Main {
         }
     }
 
-       private static void calcularCronograma() {
+    private static boolean hayMenuRegistrado() {
         if (platos.size() < MINIMO_PLATOS || horaServicioMin < 0) {
             System.out.println("\nPrimero registre un menu con al menos " + MINIMO_PLATOS + " platos (opcion 1).");
+            return false;
+        }
+        return true;
+    }
+
+    private static Cronograma armarCronograma() {
+        return new Cronograma(Planificador.calcularCronograma(platos, horaServicioMin));
+    }
+
+    private static void calcularCronograma() {
+        if (!hayMenuRegistrado()) {
             return;
         }
 
         int horaActualMin = LecturaConsola.leerHora("Hora actual o de inicio disponible (HH:mm): ");
-        Cronograma cronograma = new Cronograma(Planificador.calcularCronograma(platos, horaServicioMin));
+        Cronograma cronograma = armarCronograma();
         ValidadorHorario validador = new ValidadorHorario(cronograma, horaServicioMin, horaActualMin);
         System.out.println("\n" + ReporteCronograma.formatear(cronograma, validador));
     }
-        
 
-    private static void mostrarCronograma(List<PasoCronograma> pasos) {
-        System.out.println("\n--- CRONOGRAMA (servicio a las " + formatearHora(horaServicioMin) + ") ---");
-        System.out.printf("%-12s%-12s%-20s%-25s%-8s%n", "Hora inicio", "Hora fin", "Plato", "Tarea", "Tipo");
-        for (PasoCronograma paso : pasos) {
-            System.out.printf("%-12s%-12s%-20s%-25s%-8s%n",
-                    formatearHora(paso.getInicioMin()),
-                    formatearHora(paso.getFinMin()),
-                    paso.getNombrePlato(),
-                    paso.getTarea().getNombre(),
-                    paso.getTarea().getTipo().getEtiqueta());
+    private static void consultarCronograma() {
+        if (!hayMenuRegistrado()) {
+            return;
         }
-    }
 
-    private static String formatearHora(int minutosDesdeMedianoche) {
-        if (minutosDesdeMedianoche < 0) {
-            return "<00:00";
-        }
-        return ConversorTiempo.minutosAHora(minutosDesdeMedianoche);
-    }
+        Cronograma cronograma = armarCronograma();
+        System.out.println("\n--- CONSULTAR CRONOGRAMA ---");
+        System.out.println("1) Tareas de un plato");
+        System.out.println("2) Tareas por tipo (Activa o Pasiva)");
+        System.out.println("3) Resumen agrupado por plato");
+        int opcion = LecturaConsola.leerOpcion("Elija una consulta: ", 1, 3);
 
-    
-    private static String leerLinea(String mensaje) {
-        System.out.print(mensaje);
-        if (!SCANNER.hasNextLine()) {
-            System.out.println("\nEntrada finalizada. Hasta pronto.");
-            System.exit(0);
-        }
-        return SCANNER.nextLine().trim();
-    }
-
-    private static String leerTexto(String mensaje) {
-        while (true) {
-            String valor = leerLinea(mensaje);
-            if (!valor.isEmpty()) {
-                return valor;
+        switch (opcion) {
+            case 1 -> {
+                Plato plato = buscarPlato();
+                System.out.println("\n" + ReporteCronograma.formatearConsulta(
+                        "Tareas de \"" + plato.getNombre() + "\"",
+                        cronograma.filtrarPorPlato(plato.getNombre())));
             }
-            System.out.println("  Error: el dato no puede estar vacio.");
-        }
-    }
-
-    private static int leerEnteroPositivo(String mensaje) {
-        while (true) {
-            try {
-                int numero = Integer.parseInt(leerLinea(mensaje));
-                if (numero > 0) {
-                    return numero;
-                }
-                System.out.println("  Error: el numero debe ser mayor que 0.");
-            } catch (NumberFormatException e) {
-                System.out.println("  Error: ingrese un numero entero valido (sin letras).");
+            case 2 -> {
+                int tipoOpcion = LecturaConsola.leerOpcion("Tipo (1 = Activa, 2 = Pasiva): ", 1, 2);
+                Tarea.Tipo tipo = (tipoOpcion == 1) ? Tarea.Tipo.ACTIVA : Tarea.Tipo.PASIVA;
+                System.out.println("\n" + ReporteCronograma.formatearConsulta(
+                        "Tareas de tipo " + tipo.getEtiqueta(),
+                        cronograma.filtrarPorTipo(tipo)));
             }
-        }
-    }
-
-    private static int leerOpcion(String mensaje, int minimo, int maximo) {
-        while (true) {
-            try {
-                int opcion = Integer.parseInt(leerLinea(mensaje));
-                if (opcion >= minimo && opcion <= maximo) {
-                    return opcion;
-                }
-            } catch (NumberFormatException e) {
-              
-            }
-            System.out.println("  Error: elija una opcion entre " + minimo + " y " + maximo + ".");
+            case 3 -> System.out.println("\n" + ReporteCronograma.formatearResumenPorPlato(cronograma, platos));
         }
     }
 
 
-    private static int leerHora(String mensaje) {
+    private static Plato buscarPlato() {
         while (true) {
-            String texto = leerLinea(mensaje);
-            if (ConversorTiempo.esHoraValida(texto)) {
-                return ConversorTiempo.horaAMinutos(texto);
+            String nombre = LecturaConsola.leerTexto("Nombre del plato a consultar: ");
+            Plato plato = platosPorNombre.get(nombre.toLowerCase());
+            if (plato != null) {
+                return plato;
             }
-            System.out.println("  Error: formato de hora invalido. Use HH:mm de 24 horas (ej. 13:30).");
+            System.out.println("  Error: no hay un plato llamado \"" + nombre + "\". Platos registrados:");
+            for (Plato registrado : platos) {
+                System.out.println("    - " + registrado.getNombre());
+            }
         }
     }
 }

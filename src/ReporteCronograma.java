@@ -32,6 +32,35 @@ public final class ReporteCronograma {
         return texto.toString();
     }
 
+
+        /** Tabla con el resultado de una consulta (filtro por plato o por tipo). */
+    public static String formatearConsulta(String titulo, List<PasoCronograma> pasos) {
+        if (pasos.isEmpty()) {
+            return "=== " + titulo + " ===\nNo hay tareas que coincidan con la consulta.";
+        }
+        return "=== " + titulo + " ===\n" + formatearTabla(pasos) + "\nTareas encontradas: " + pasos.size();
+    }
+
+    /** Reporte agrupado: una linea por plato con sus tareas, inicio, fin y minutos activos. */
+    public static String formatearResumenPorPlato(Cronograma cronograma, List<Plato> platos) {
+        StringBuilder texto = new StringBuilder("=== RESUMEN POR PLATO ===\n");
+        for (Plato plato : platos) {
+            List<PasoCronograma> pasosPlato = cronograma.filtrarPorPlato(plato.getNombre());
+            int minutosActivos = 0;
+            for (PasoCronograma paso : pasosPlato) {
+                if (paso.getTarea().esActiva()) {
+                    minutosActivos += paso.getTarea().getDuracionMinutos();
+                }
+            }
+            texto.append(String.format("%-20s Tareas: %d | Empieza: %s | Termina: %s | Minutos activos: %d%n",
+                    plato.getNombre(),
+                    pasosPlato.size(),
+                    formatearHora(pasosPlato.get(0).getInicioMin()),
+                    formatearHora(pasosPlato.get(pasosPlato.size() - 1).getFinMin()),
+                    minutosActivos));
+        }
+        return texto.toString().trim();
+    }
     
     private static String formatearEstado(ValidadorHorario validador) {
         if (!validador.hayConflicto()) {
